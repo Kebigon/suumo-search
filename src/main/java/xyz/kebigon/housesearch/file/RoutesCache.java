@@ -21,6 +21,12 @@ import xyz.kebigon.housesearch.domain.Route;
 @NoArgsConstructor
 public class RoutesCache
 {
+    private static final File ROUTES_CACHE_FILE = new File("var/state/routes-cache.json");
+    static
+    {
+        ROUTES_CACHE_FILE.getParentFile().mkdirs();
+    }
+
     private Map<String, Collection<Route>> cache = new HashMap<>();
 
     public Collection<Route> get(String cacheKey)
@@ -33,21 +39,21 @@ public class RoutesCache
         cache.put(cacheKey, routes);
     }
 
-    public void save(File file) throws JsonGenerationException, JsonMappingException, IOException
+    public void save() throws JsonGenerationException, JsonMappingException, IOException
     {
-        log.info("Saving {} routes to {}", cache.size(), file);
+        log.info("Saving {} routes to {}", cache.size(), ROUTES_CACHE_FILE.getAbsolutePath());
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(file, this);
+        mapper.writeValue(ROUTES_CACHE_FILE, this);
     }
 
-    public static RoutesCache load(File file) throws JsonParseException, JsonMappingException, IOException
+    public static RoutesCache load() throws JsonParseException, JsonMappingException, IOException
     {
-        if (file.exists())
+        if (ROUTES_CACHE_FILE.exists())
         {
-            log.info("Loading routes cache from {}", file);
+            log.info("Loading routes cache from {}", ROUTES_CACHE_FILE.getAbsolutePath());
 
             final ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(file, RoutesCache.class);
+            return mapper.readValue(ROUTES_CACHE_FILE, RoutesCache.class);
         }
         else
             return new RoutesCache();

@@ -1,6 +1,5 @@
 package xyz.kebigon.housesearch.browser.yahoo.transit;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,8 +21,7 @@ public class YahooTransitBrowser extends Browser
 
     public YahooTransitBrowser() throws JsonParseException, JsonMappingException, IOException
     {
-        final File file = new File("cache.json");
-        cache = RoutesCache.load(file);
+        cache = RoutesCache.load();
     }
 
     @Override
@@ -31,8 +29,7 @@ public class YahooTransitBrowser extends Browser
     {
         super.close();
 
-        final File file = new File("cache.json");
-        cache.save(file);
+        cache.save();
     }
 
     public Collection<Route> search(String from, String to)

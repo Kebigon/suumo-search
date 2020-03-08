@@ -17,7 +17,11 @@ import xyz.kebigon.housesearch.domain.Posting;
 @Slf4j
 public class SearchArchive implements Closeable
 {
-    private static final File ARCHIVE_FILE = new File("archive");
+    private static final File ARCHIVE_FILE = new File("var/state/archive");
+    static
+    {
+        ARCHIVE_FILE.getParentFile().mkdirs();
+    }
 
     private final Collection<String> urls = new HashSet<String>();
 
