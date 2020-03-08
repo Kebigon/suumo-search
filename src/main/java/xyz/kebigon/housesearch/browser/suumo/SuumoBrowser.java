@@ -12,11 +12,11 @@ import xyz.kebigon.housesearch.browser.Browser;
 import xyz.kebigon.housesearch.domain.Posting;
 import xyz.kebigon.housesearch.domain.SearchConditions;
 import xyz.kebigon.housesearch.domain.SearchConditionsValidator;
-import xyz.kebigon.housesearch.file.SearchArchive;
+import xyz.kebigon.housesearch.file.SentPostingsCache;
 
 public class SuumoBrowser extends Browser
 {
-    public Collection<Posting> search(SearchConditions conditions, SearchArchive archive)
+    public Collection<Posting> search(SearchConditions conditions, SentPostingsCache sentPostings)
     {
         navigateTo(SuumoSearchURLBuilder.build(conditions));
 
@@ -26,7 +26,7 @@ public class SuumoBrowser extends Browser
         {
             postings.addAll(findElements("//div[@class='property_unit-content']").parallelStream() //
                     .map(SuumoBrowser::createPosting)//
-                    .filter(archive::filter) //
+                    .filter(sentPostings::notSent) //
                     .filter(posting -> SearchConditionsValidator.validateBasicConditions(posting, conditions)) //
                     .collect(Collectors.toList()));
         } while (click("//a[text()='次へ']"));
