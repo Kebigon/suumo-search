@@ -60,6 +60,10 @@ public class EmailSender
         for (final String address : mailSession.getProperty("housesearch.mail.to").split(","))
             email.addTo(address.trim());
 
+        email.setFrom(mailSession.getProperty("housesearch.mail.bcc").trim());
+        for (final String address : mailSession.getProperty("housesearch.mail.bcc").split(","))
+            email.addBcc(address.trim());
+
         email.send();
     }
 

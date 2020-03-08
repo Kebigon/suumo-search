@@ -71,7 +71,6 @@ public class HouseSearchApplication
             postings.forEach(sentPostings::add);
 
             log.info("Email notification sent, terminating");
-
         }
         finally
         {
