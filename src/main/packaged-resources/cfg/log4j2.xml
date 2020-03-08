@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="warn">
+	<Properties>
+		<Property name="pattern">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+	</Properties>
+
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="${pattern}" />
 		</Console>
+
+		<RollingFile name="File" fileName="var/log/suumo-app.log" filePattern="var/log/suumo-app-%d{yyyyMMdd}.%i.gz">
+			<PatternLayout pattern="${pattern}" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="5MB" />
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+			<DefaultRolloverStrategy fileIndex="nomax" />
+		</RollingFile>
 	</Appenders>
+
 	<Loggers>
-		<Logger name="com.gargoylesoftware.htmlunit" level="error" additivity="false">
-			<AppenderRef ref="Console" />
-		</Logger>
-		<Logger name="org.apache.http" level="error" additivity="false">
-			<AppenderRef ref="Console" />
-		</Logger>
+		<Logger name="com.gargoylesoftware.htmlunit" level="error" />
+		<Logger name="org.apache.http" level="error" />
+
 		<Root level="trace">
 			<AppenderRef ref="Console" />
+			<AppenderRef ref="File" />
 		</Root>
 	</Loggers>
 </Configuration>
