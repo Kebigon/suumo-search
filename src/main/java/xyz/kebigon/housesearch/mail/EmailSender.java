@@ -56,13 +56,20 @@ public class EmailSender
         email.setCharset("UTF-8");
         email.setMsg(content);
 
-        email.setFrom(mailSession.getProperty("housesearch.mail.to").trim());
-        for (final String address : mailSession.getProperty("housesearch.mail.to").split(","))
-            email.addTo(address.trim());
+        String from = mailSession.getProperty("housesearch.mail.from");
+        String to = mailSession.getProperty("housesearch.mail.to");
+        String bcc = mailSession.getProperty("housesearch.mail.bcc");
 
-        email.setFrom(mailSession.getProperty("housesearch.mail.bcc").trim());
-        for (final String address : mailSession.getProperty("housesearch.mail.bcc").split(","))
-            email.addBcc(address.trim());
+        if (from != null && !(from = from.trim()).isEmpty())
+            email.setFrom(from);
+
+        if (to != null && !(to = to.trim()).isEmpty())
+            for (final String address : mailSession.getProperty(to).split(","))
+                email.addTo(address.trim());
+
+        if (bcc != null && !(bcc = bcc.trim()).isEmpty())
+            for (final String address : bcc.split(","))
+                email.addBcc(address.trim());
 
         email.send();
     }
