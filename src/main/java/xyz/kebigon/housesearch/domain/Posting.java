@@ -21,12 +21,12 @@ public class Posting
     private final Integer age;
 
     /**
-     * Land surface (in squared meters)
+     * Land surface (in square meters)
      */
     private final Double landSurface;
 
     /**
-     * House surface (in squared meters)
+     * House surface (in square meters)
      */
     private final Double houseSurface;
 
