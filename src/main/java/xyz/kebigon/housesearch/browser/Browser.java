@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class Browser implements Closeable
 {
-    private final WebDriver driver;
+    private WebDriver driver;
 
     protected Browser()
     {
@@ -34,6 +34,16 @@ public abstract class Browser implements Closeable
         driver.navigate().to(url);
     }
 
+    protected void restartBrowser()
+    {
+        final String url = driver.getCurrentUrl();
+        log.info("Restarting browser, navigate to {}", url);
+        
+        driver.quit();
+        driver = new HtmlUnitDriver();
+        driver.navigate().to(url);
+    }
+
     protected List<WebElement> findElements(String xpathExpression)
     {
         return driver.findElements(By.xpath(xpathExpression));
@@ -43,7 +53,9 @@ public abstract class Browser implements Closeable
     {
         try
         {
-            driver.findElement(By.xpath(xpathExpression)).click();
+            final WebElement element = driver.findElement(By.xpath(xpathExpression));
+            log.info("Click on {}, navigate to {}", element.getText(), element.getAttribute("href"));
+            element.click();
             return true;
         }
         catch (final NoSuchElementException e)

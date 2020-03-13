@@ -24,6 +24,10 @@ public class SuumoBrowser extends Browser
 
         do
         {
+            // Suumo detected us as a bot, we need to restart the browser
+            while (!findElements("//div[@class='l-error']").isEmpty())
+                restartBrowser();
+
             postings.addAll(findElements("//div[@class='property_unit-content']").parallelStream() //
                     .map(SuumoBrowser::createPosting)//
                     .filter(sentPostings::notSent) //
