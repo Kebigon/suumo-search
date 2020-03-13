@@ -43,8 +43,11 @@ public class SuumoBrowser extends Browser
         final String url = posting.findElement(By.xpath("./div[@class='property_unit-header']/h2/a")).getAttribute("href");
 
         final String priceField = getField(posting, "販売価格");
-        final int priceSubstringIndex = priceField.indexOf("万円");
-        final long price = Long.parseLong(priceField.substring(0, priceSubstringIndex)) * 10000;
+        final int tenthOfThousandsIndex = priceField.indexOf('万');
+        final int currencyIndex = priceField.indexOf('円', tenthOfThousandsIndex);
+        long price = Long.parseLong(priceField.substring(0, tenthOfThousandsIndex)) * 10000;
+        if (tenthOfThousandsIndex + 1 != currencyIndex)
+            price += Long.parseLong(priceField.substring(tenthOfThousandsIndex + 1, currencyIndex));
 
         final String ageField = getField(posting, "築年月");
         final int ageSubstringIndex = ageField.indexOf("年");
