@@ -72,6 +72,10 @@ public class HouseSearchApplication
 
             log.info("Email notification sent, terminating");
         }
+        catch (final Throwable t)
+        {
+            log.error("Unrecoverable exception", t);
+        }
         finally
         {
             sentPostings.save();

@@ -18,14 +18,14 @@ public class SearchConditionsValidator
         final String url = posting.getUrl();
         if (url == null)
         {
-            log.warn("Missing url for {}", posting);
+            log.debug("Missing url for {}", posting);
             return false;
         }
 
         final Long price = posting.getPrice();
         if (price == null)
         {
-            log.warn("Missing price for {}", posting);
+            log.debug("Missing price for {}", posting);
             return false;
         }
         if (conditions.getMinPrice() != null && price < conditions.getMinPrice())
@@ -36,7 +36,7 @@ public class SearchConditionsValidator
         final Integer age = posting.getAge();
         if (age == null)
         {
-            log.warn("Missing age for {}", posting);
+            log.debug("Missing age for {}", posting);
             return false;
         }
         if (conditions.getMinAge() != null && age < conditions.getMinAge())
@@ -47,7 +47,7 @@ public class SearchConditionsValidator
         final Double landSurface = posting.getLandSurface();
         if (landSurface == null)
         {
-            log.warn("Missing landSurface for {}", posting);
+            log.debug("Missing landSurface for {}", posting);
             return false;
         }
         if (conditions.getMinLandSurface() != null && landSurface < conditions.getMinLandSurface())
@@ -58,7 +58,7 @@ public class SearchConditionsValidator
         final Double houseSurface = posting.getHouseSurface();
         if (houseSurface == null)
         {
-            log.warn("Missing houseSurface for {}", posting);
+            log.debug("Missing houseSurface for {}", posting);
             return false;
         }
         if (conditions.getMinHouseSurface() != null && houseSurface < conditions.getMinHouseSurface())
@@ -69,7 +69,7 @@ public class SearchConditionsValidator
         final Integer walkTimeToStation = posting.getWalkTimeToStation();
         if (walkTimeToStation == null)
         {
-            log.warn("Missing walkTimeToStation for {}", posting);
+            log.debug("Missing walkTimeToStation for {}", posting);
             return false;
         }
         if (conditions.getMaxWalkTimeToStation() != null && walkTimeToStation > conditions.getMaxWalkTimeToStation())
@@ -78,7 +78,7 @@ public class SearchConditionsValidator
         final String station = posting.getStation();
         if (station == null)
         {
-            log.warn("Missing station for {}", posting);
+            log.debug("Missing station for {}", posting);
             return false;
         }
 
