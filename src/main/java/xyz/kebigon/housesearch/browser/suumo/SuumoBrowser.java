@@ -60,9 +60,22 @@ public class SuumoBrowser extends Browser
         final String stationField = getField(posting, "沿線・駅");
 
         final int walkTimeToStationSubstringIndex = stationField.indexOf("徒歩");
-        final Integer walkTimeToStation = walkTimeToStationSubstringIndex != -1
-                ? Integer.parseInt(stationField.substring(walkTimeToStationSubstringIndex + 2, stationField.indexOf("分", walkTimeToStationSubstringIndex)))
-                : null;
+        Integer walkTimeToStation = null;
+        if (walkTimeToStationSubstringIndex != -1)
+            walkTimeToStation = Integer
+                    .parseInt(stationField.substring(walkTimeToStationSubstringIndex + 2, stationField.indexOf("分", walkTimeToStationSubstringIndex)));
+        else
+        {
+            final int carIndex = stationField.indexOf("車");
+            final int kmIndex = stationField.indexOf("km");
+
+            if (carIndex != -1 && kmIndex != -1)
+            {
+                final double distanceToStation = Double.parseDouble(stationField.substring(carIndex + 1, kmIndex));
+                // I'll take 1.43 m/s = 11.7 min/km as average walking speed
+                walkTimeToStation = (int) (distanceToStation * 11.7d);
+            }
+        }
 
         final int stationOpenBracketIndex = stationField.indexOf('「');
         final int stationCloseBracketIndex = stationField.indexOf('」');
