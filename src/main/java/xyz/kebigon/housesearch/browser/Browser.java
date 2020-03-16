@@ -38,7 +38,7 @@ public abstract class Browser implements Closeable
     {
         final String url = driver.getCurrentUrl();
         log.info("Restarting browser, navigate to {}", url);
-        
+
         driver.quit();
         driver = new HtmlUnitDriver();
         driver.navigate().to(url);
@@ -60,6 +60,7 @@ public abstract class Browser implements Closeable
         }
         catch (final NoSuchElementException e)
         {
+            log.warn("Unable to click on '{}'", xpathExpression);
             return false;
         }
     }

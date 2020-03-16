@@ -51,12 +51,12 @@ public class YahooTransitBrowser extends Browser
             for (final WebElement element : findElements("//ul[@class='routeList']/li/dl/dd/ul"))
                 routes.add(createRoute(from, to, element));
 
-            click("//ul[@id='tabflt']/li/a[@data-rapid_p='2']");
+            click("//ul[@id='tabflt']/li[2]/a");
 
             for (final WebElement element : findElements("//ul[@class='routeList']/li/dl/dd/ul"))
                 routes.add(createRoute(from, to, element));
 
-            click("//ul[@id='tabflt']/li/a[@data-rapid_p='3']");
+            click("//ul[@id='tabflt']/li[3]/a");
 
             for (final WebElement element : findElements("//ul[@class='routeList']/li/dl/dd/ul"))
                 routes.add(createRoute(from, to, element));
