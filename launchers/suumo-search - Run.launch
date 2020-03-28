@@ -18,6 +18,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="xyz.kebigon.housesearch.HouseSearchApplication"/>
+<stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="suumo-search"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="suumo-search"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>
