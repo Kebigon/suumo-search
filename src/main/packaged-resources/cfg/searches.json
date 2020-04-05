@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Cheap house",
+        "area": "KANTO",
+        "type": "USED_HOUSE",
+        "price.min": null,
+        "price.max": 12000000,
+        "age.min": null,
+        "age.max": 20,
+        "surface.land.min": 100,
+        "surface.land.max": null,
+        "surface.house.min": 80,
+        "surface.house.max": null,
+        "station.walktime.max": null,
+        "expression.file": "cheap-house-expression.cfg"
+    },
+    {
+        "name": "House close to Tokyo",
+        "area": "KANTO",
+        "type": "USED_HOUSE",
+        "price.min": null,
+        "price.max": 20000000,
+        "age.min": null,
+        "age.max": 20,
+        "surface.land.min": 100,
+        "surface.land.max": null,
+        "surface.house.min": 80,
+        "surface.house.max": null,
+        "station.walktime.max": null,
+        "expression.file": "tokyo-house-expression.cfg"
+    }
+]

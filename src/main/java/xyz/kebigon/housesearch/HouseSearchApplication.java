@@ -19,66 +19,71 @@ import xyz.kebigon.housesearch.mail.EmailSender;
 @Slf4j
 public class HouseSearchApplication
 {
-    public static void main(String[] args) throws IOException, EmailException
-    {
-        final SearchConditions conditions = SearchConditions.load();
-        final SentPostingsCache sentPostings = SentPostingsCache.load();
+	public static void main(String[] args) throws IOException, EmailException
+	{
+		final SentPostingsCache sentPostings = SentPostingsCache.load();
 
-        try
-        {
-            Collection<Posting> postings;
+		try
+		{
+			for (final SearchConditions conditions : SearchConditions.load())
+				processConditions(conditions, sentPostings);
+		}
+		catch (final Throwable t)
+		{
+			log.error("Unrecoverable exception", t);
+		}
+		finally
+		{
+			sentPostings.save();
+		}
+	}
 
-            try (final SuumoBrowser suumo = new SuumoBrowser())
-            {
-                postings = suumo.search(conditions, sentPostings);
-            }
+	private static void processConditions(SearchConditions conditions, SentPostingsCache sentPostings) throws IOException, EmailException
+	{
+		Collection<Posting> postings;
 
-            if (postings.isEmpty())
-            {
-                log.info("No postings found on Suumo, terminating");
-                return;
-            }
+		try (final SuumoBrowser suumo = new SuumoBrowser())
+		{
+			postings = suumo.search(conditions, sentPostings);
+		}
 
-            if (!StringUtils.isEmpty(conditions.getExpression()))
-            {
-                try (final YahooTransitBrowser yahooTransit = new YahooTransitBrowser())
-                {
-                    ApplicationContext.setYahooTransitBrowser(yahooTransit);
+		if (postings.isEmpty())
+		{
+			log.info("No postings found on Suumo, terminating");
+			return;
+		}
 
-                    postings = postings.stream() // Do not parallel here
-                            .filter(property -> SearchConditionsValidator.validateExpression(property, conditions)).collect(Collectors.toList());
-                }
+		if (!StringUtils.isEmpty(conditions.getExpression()))
+		{
+			try (final YahooTransitBrowser yahooTransit = new YahooTransitBrowser())
+			{
+				ApplicationContext.setYahooTransitBrowser(yahooTransit);
 
-                if (postings.isEmpty())
-                {
-                    log.info("No postings left after applying expression filter, terminating");
-                    return;
-                }
-            }
+				postings = postings.stream() // Do not parallel here
+						.filter(property -> SearchConditionsValidator.validateExpression(property, conditions)).collect(Collectors.toList());
+			}
 
-            log.info("=======[ RESULTS ]=======");
-            log.info("Found {} postings", postings.size());
+			if (postings.isEmpty())
+			{
+				log.info("No postings left after applying expression filter, terminating");
+				return;
+			}
+		}
 
-            for (final Posting posting : postings)
-                log.info("-> {}", posting);
+		log.info("=======[ RESULTS ]=======");
+		log.info("Found {} postings", postings.size());
 
-            log.info("Sending email notification");
+		for (final Posting posting : postings)
+			log.info("-> {}", posting);
 
-            final EmailSender sender = new EmailSender();
-            sender.send(postings);
+		log.info("Sending email notification");
 
-            // Register sent postings
-            postings.forEach(sentPostings::add);
+		final EmailSender sender = new EmailSender();
+		sender.send(postings, conditions);
 
-            log.info("Email notification sent, terminating");
-        }
-        catch (final Throwable t)
-        {
-            log.error("Unrecoverable exception", t);
-        }
-        finally
-        {
-            sentPostings.save();
-        }
-    }
+		// Register sent postings
+		postings.forEach(sentPostings::add);
+
+		log.info("Email notification sent, terminating");
+	}
 }

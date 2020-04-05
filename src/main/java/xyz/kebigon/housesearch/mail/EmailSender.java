@@ -13,131 +13,138 @@ import org.apache.commons.mail.HtmlEmail;
 import xyz.kebigon.housesearch.HouseSearchApplication;
 import xyz.kebigon.housesearch.domain.Posting;
 import xyz.kebigon.housesearch.domain.Route;
+import xyz.kebigon.housesearch.domain.SearchConditions;
 
 public class EmailSender
 {
-    private final Session mailSession;
+	private static final String ONE_POSTING_TITLE = "[%1$s] %2$syo house found near %3$s station for %4$s万円";
+	private static final String SEVERAL_POSTINGS_TITLE = "[%1$s] %2$s houses found";
 
-    public EmailSender() throws IOException
-    {
-        final Properties mailProperties = new Properties();
-        mailProperties.load(HouseSearchApplication.class.getClassLoader().getResourceAsStream("mail.cfg"));
-        mailSession = Session.getInstance(mailProperties);
-    }
+	private final Session mailSession;
 
-    public void send(Collection<Posting> postings) throws EmailException
-    {
-        // Send email separately
-        if (postings.size() <= 3)
-        {
-            for (final Posting posting : postings)
-            {
-                final StringBuilder builder = new StringBuilder();
-                appendPosting(posting, builder);
-                send(posting.getAge() + "yo house found near " + posting.getStation() + " station for " + (posting.getPrice() / 10000) + "万円",
-                        builder.toString());
-            }
-        }
-        // Send one email with all results
-        else
-        {
-            final StringBuilder builder = new StringBuilder();
-            for (final Posting posting : postings)
-                appendPosting(posting, builder);
-            send(postings.size() + " houses found", builder.toString());
-        }
-    }
+	public EmailSender() throws IOException
+	{
+		final Properties mailProperties = new Properties();
+		mailProperties.load(HouseSearchApplication.class.getClassLoader().getResourceAsStream("mail.cfg"));
+		mailSession = Session.getInstance(mailProperties);
+	}
 
-    private void send(String title, String content) throws EmailException
-    {
-        final Email email = new HtmlEmail();
-        email.setMailSession(mailSession);
-        email.setSubject(title);
-        email.setCharset("UTF-8");
-        email.setMsg(content);
+	public void send(Collection<Posting> postings, SearchConditions conditions) throws EmailException
+	{
+		// Send email separately
+		if (postings.size() <= 3)
+		{
+			for (final Posting posting : postings)
+			{
+				final String title = String.format(ONE_POSTING_TITLE, conditions.getName(), posting.getAge(), posting.getStation(), posting.getPrice() / 10000);
 
-        String from = mailSession.getProperty("housesearch.mail.from");
-        String to = mailSession.getProperty("housesearch.mail.to");
-        String bcc = mailSession.getProperty("housesearch.mail.bcc");
+				final StringBuilder builder = new StringBuilder();
+				appendPosting(posting, builder);
+				send(title, builder.toString());
+			}
+		}
+		// Send one email with all results
+		else
+		{
+			final String title = String.format(SEVERAL_POSTINGS_TITLE, conditions.getName(), postings.size());
 
-        if (from != null && !(from = from.trim()).isEmpty())
-            email.setFrom(from);
+			final StringBuilder builder = new StringBuilder();
+			for (final Posting posting : postings)
+				appendPosting(posting, builder);
+			send(title, builder.toString());
+		}
+	}
 
-        if (to != null && !(to = to.trim()).isEmpty())
-            for (final String address : mailSession.getProperty(to).split(","))
-                email.addTo(address.trim());
+	private void send(String title, String content) throws EmailException
+	{
+		final Email email = new HtmlEmail();
+		email.setMailSession(mailSession);
+		email.setSubject(title);
+		email.setCharset("UTF-8");
+		email.setMsg(content);
 
-        if (bcc != null && !(bcc = bcc.trim()).isEmpty())
-            for (final String address : bcc.split(","))
-                email.addBcc(address.trim());
+		String from = mailSession.getProperty("housesearch.mail.from");
+		String to = mailSession.getProperty("housesearch.mail.to");
+		String bcc = mailSession.getProperty("housesearch.mail.bcc");
 
-        email.send();
-    }
+		if (from != null && !(from = from.trim()).isEmpty())
+			email.setFrom(from);
 
-    private static void appendPosting(Posting posting, StringBuilder builder)
-    {
-        builder.append("<p><a href=\"").append(posting.getUrl()).append("\">");
-        builder.append(posting.getAge()).append("yo house near ").append(posting.getStation()).append(" station for ").append(posting.getPrice() / 10000)
-                .append("万円");
-        builder.append("</a>");
-        builder.append("<br>House surface: ").append(Math.round(posting.getHouseSurface())).append("m2 / ")
-                .append(Math.round(posting.getHouseSurface() * 0.3025)).append("坪");
-        builder.append("<br>Land surface: ").append(Math.round(posting.getLandSurface())).append("m2 / ").append(Math.round(posting.getLandSurface() * 0.3025))
-                .append("坪");
+		if (to != null && !(to = to.trim()).isEmpty())
+			for (final String address : mailSession.getProperty(to).split(","))
+				email.addTo(address.trim());
 
-        appendRoutes(posting, builder);
+		if (bcc != null && !(bcc = bcc.trim()).isEmpty())
+			for (final String address : bcc.split(","))
+				email.addBcc(address.trim());
 
-        builder.append("</p>");
-    }
+		email.send();
+	}
 
-    private static void appendRoutes(Posting posting, StringBuilder builder)
-    {
-        final Route fastestRoute = posting.getFastestRoute();
-        final Route cheapestRoute = posting.getCheapestRoute();
-        final Route easiestRoute = posting.getEasiestRoute();
+	private static void appendPosting(Posting posting, StringBuilder builder)
+	{
+		builder.append("<p><a href=\"").append(posting.getUrl()).append("\">");
+		builder.append(posting.getAge()).append("yo house near ").append(posting.getStation()).append(" station for ").append(posting.getPrice() / 10000)
+				.append("万円");
+		builder.append("</a>");
+		builder.append("<br>House surface: ").append(Math.round(posting.getHouseSurface())).append("m2 / ")
+				.append(Math.round(posting.getHouseSurface() * 0.3025)).append("坪");
+		builder.append("<br>Land surface: ").append(Math.round(posting.getLandSurface())).append("m2 / ").append(Math.round(posting.getLandSurface() * 0.3025))
+				.append("坪");
 
-        // No route have been analyzed
-        if (fastestRoute == null && cheapestRoute == null && easiestRoute == null)
-            return;
+		appendRoutes(posting, builder);
 
-        builder.append("<br>Routes: ");
+		builder.append("</p>");
+	}
 
-        if (fastestRoute == cheapestRoute)
-            if (fastestRoute == easiestRoute)
-                appendRoute("Best", posting, fastestRoute, builder);
-            else
-            {
-                appendRoute("Fastest & Cheapest", posting, fastestRoute, builder);
-                appendRoute("Easiest", posting, easiestRoute, builder);
-            }
-        else if (fastestRoute == easiestRoute)
-        {
-            appendRoute("Fastest & Easiest", posting, fastestRoute, builder);
-            appendRoute("Cheapest", posting, cheapestRoute, builder);
-        }
-        else
-        {
-            appendRoute("Fastest", posting, fastestRoute, builder);
+	private static void appendRoutes(Posting posting, StringBuilder builder)
+	{
+		final Route fastestRoute = posting.getFastestRoute();
+		final Route cheapestRoute = posting.getCheapestRoute();
+		final Route easiestRoute = posting.getEasiestRoute();
 
-            if (cheapestRoute == easiestRoute)
-                appendRoute("Cheapest & Easiest", posting, cheapestRoute, builder);
-            else
-            {
-                appendRoute("Cheapest", posting, cheapestRoute, builder);
-                appendRoute("Easiest", posting, easiestRoute, builder);
-            }
-        }
-    }
+		// No route have been analyzed
+		if (fastestRoute == null && cheapestRoute == null && easiestRoute == null)
+			return;
 
-    private static void appendRoute(String label, Posting property, Route route, StringBuilder builder)
-    {
-        if (route == null)
-            return;
+		builder.append("<br>Routes: ");
 
-        builder.append("<br>- ").append(label).append(": ");
-        builder.append(route.getTime() + property.getWalkTimeToStation()).append("min to ").append(route.getTo());
-        builder.append(" (walk: ").append(property.getWalkTimeToStation()).append("min, train: ").append(route.getTime()).append("min)");
-        builder.append(" / ").append(route.getFare()).append("円");
-        builder.append(" / ").append(route.getTransfer()).append(" transfer");
-    }
+		if (fastestRoute == cheapestRoute)
+			if (fastestRoute == easiestRoute)
+				appendRoute("Best", posting, fastestRoute, builder);
+			else
+			{
+				appendRoute("Fastest & Cheapest", posting, fastestRoute, builder);
+				appendRoute("Easiest", posting, easiestRoute, builder);
+			}
+		else if (fastestRoute == easiestRoute)
+		{
+			appendRoute("Fastest & Easiest", posting, fastestRoute, builder);
+			appendRoute("Cheapest", posting, cheapestRoute, builder);
+		}
+		else
+		{
+			appendRoute("Fastest", posting, fastestRoute, builder);
+
+			if (cheapestRoute == easiestRoute)
+				appendRoute("Cheapest & Easiest", posting, cheapestRoute, builder);
+			else
+			{
+				appendRoute("Cheapest", posting, cheapestRoute, builder);
+				appendRoute("Easiest", posting, easiestRoute, builder);
+			}
+		}
+	}
+
+	private static void appendRoute(String label, Posting property, Route route, StringBuilder builder)
+	{
+		if (route == null)
+			return;
+
+		builder.append("<br>- ").append(label).append(": ");
+		builder.append(route.getTime() + property.getWalkTimeToStation()).append("min to ").append(route.getTo());
+		builder.append(" (walk: ").append(property.getWalkTimeToStation()).append("min, train: ").append(route.getTime()).append("min)");
+		builder.append(" / ").append(route.getFare()).append("円");
+		builder.append(" / ").append(route.getTransfer()).append(" transfer");
+	}
 }
