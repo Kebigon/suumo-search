@@ -4,7 +4,7 @@
 
 	<groupId>xyz.kebigon</groupId>
 	<artifactId>suumo-search</artifactId>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.1.2</version>
 
 	<name>suumo-search</name>
 	<description>Perform advanced searches on Suumo.jp</description>
