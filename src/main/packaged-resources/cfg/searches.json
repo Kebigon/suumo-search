@@ -4,7 +4,7 @@
         "area": "KANTO",
         "type": "USED_HOUSE",
         "price.min": null,
-        "price.max": 12000000,
+        "price.max": 11000000,
         "age.min": null,
         "age.max": 20,
         "surface.land.min": 100,
