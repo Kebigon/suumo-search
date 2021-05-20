@@ -71,7 +71,7 @@ public class EmailSender
 			email.setFrom(from);
 
 		if (to != null && !(to = to.trim()).isEmpty())
-			for (final String address : mailSession.getProperty(to).split(","))
+			for (final String address : to.split(","))
 				email.addTo(address.trim());
 
 		if (bcc != null && !(bcc = bcc.trim()).isEmpty())
