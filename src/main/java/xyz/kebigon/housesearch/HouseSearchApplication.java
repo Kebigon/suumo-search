@@ -53,7 +53,7 @@ public class HouseSearchApplication
 			return;
 		}
 
-		if (!StringUtils.isEmpty(conditions.getExpression()))
+		if (!StringUtils.hasLength(conditions.getExpression()))
 		{
 			try (final YahooTransitBrowser yahooTransit = new YahooTransitBrowser())
 			{
